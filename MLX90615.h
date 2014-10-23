@@ -6,12 +6,6 @@
 #include <Arduino.h>
 
 
-
-#define SDA_PORT PORTD
-#define SDA_PIN 3
-#define SCL_PORT PORTD
-#define SCL_PIN 2
-
 #define MLX90615_OBJECT_TEMPERATURE     0x27
 #define MLX90615_AMBIENT_TEMPERATURE    0x26
 #define AccessEEPROM                    0x13
