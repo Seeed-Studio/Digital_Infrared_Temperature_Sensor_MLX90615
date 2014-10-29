@@ -1,10 +1,10 @@
-#include "MLX90615.h"
 
 #define SDA_PORT PORTD
-#define SDA_PIN 3   //define the SDA pin
+#define SDA_PIN 3   //define the SDA pin         
 #define SCL_PORT PORTD
-#define SCL_PIN 2  //define the SCL pin
+#define SCL_PIN 2   //define the SCL pin
 
+#include "MLX90615.h"
 
 MLX90615 mlx90615;
 
@@ -14,7 +14,7 @@ void setup()
   Serial.println("Setup...");
   mlx90615.init(); //initialize soft i2c wires
   
-  //mlx90615.writeEEPROM(Default_EEPROM_DATA); //write data into EEPROM when you need to adjust emissivity.
+  //mlx90615.writeEEPROM(Default_Emissivity); //write data into EEPROM when you need to adjust emissivity.
   //mlx90615.readEEPROM(); //read EEPROM data to check whether it's a default one.
 }
 
