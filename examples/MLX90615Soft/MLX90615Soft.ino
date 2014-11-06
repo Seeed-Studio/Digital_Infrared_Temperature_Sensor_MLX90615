@@ -20,6 +20,9 @@ void setup()
 
 void loop()
 { 
+    Serial.print("Object temperature: ");
     mlx90615.printTemperature(MLX90615_OBJECT_TEMPERATURE);
+    Serial.print("Ambient temperature: ");
+    mlx90615.printTemperature(MLX90615_AMBIENT_TEMPERATURE);
     delay(1000);  
 }

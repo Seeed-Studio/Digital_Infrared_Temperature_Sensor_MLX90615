@@ -87,11 +87,11 @@ public:
 		float celcius = tempData - 273.15;
 		float fahrenheit = (celcius*1.8) + 32;    
 	 
-		Serial.print("Celcius: ");
+		//Serial.print("Celcius: ");
 		Serial.println(celcius);
 
-		Serial.print("Fahrenheit: ");
-		Serial.println(fahrenheit); 
+		//Serial.print("Fahrenheit: ");
+		//Serial.println(fahrenheit); 
 	}
 	
 	/**************************************************************** 
