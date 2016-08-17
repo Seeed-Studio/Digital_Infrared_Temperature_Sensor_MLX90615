@@ -105,6 +105,7 @@ class SoftI2cMaster : public I2cMasterBase {
   uint8_t sclPin_;
 };
 //------------------------------------------------------------------------------
+#if !defined(ARDUINO_ARCH_ESP8266)
 /**
  * \class TwiMaster
  * \brief Hardware I2C master class
@@ -126,4 +127,5 @@ class TwiMaster : public I2cMasterBase {
   uint8_t status_;
   void execCmd(uint8_t cmdReg);
 };
+#endif
 #endif  // I2C_MASTER_H

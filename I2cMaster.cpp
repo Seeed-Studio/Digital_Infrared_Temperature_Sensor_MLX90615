@@ -120,6 +120,7 @@ bool SoftI2cMaster::write(uint8_t data) {
     delayMicroseconds(I2C_DELAY_USEC);
     digitalWrite(sclPin_, LOW);
   }
+
   // get Ack or Nak
   pinMode(sdaPin_, INPUT);
   // enable pullup
@@ -132,6 +133,7 @@ bool SoftI2cMaster::write(uint8_t data) {
   return rtn == 0;
 }
 //==============================================================================
+#if !defined(ARDUINO_ARCH_ESP8266)
 void TwiMaster::execCmd(uint8_t cmdReg) {
   // send command
   TWCR = cmdReg;
@@ -221,3 +223,5 @@ bool TwiMaster::write(uint8_t data) {
   execCmd((1 << TWINT) | (1 << TWEN));
   return status() == TWSR_MTX_DATA_ACK;
 }
+
+#endif
