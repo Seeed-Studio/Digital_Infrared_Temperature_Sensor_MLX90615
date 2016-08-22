@@ -133,7 +133,9 @@ bool SoftI2cMaster::write(uint8_t data) {
   return rtn == 0;
 }
 //==============================================================================
-#if !defined(ARDUINO_ARCH_ESP8266)
+
+#if defined(ARDUINO_ARCH_AVR)
+
 void TwiMaster::execCmd(uint8_t cmdReg) {
   // send command
   TWCR = cmdReg;
@@ -224,4 +226,70 @@ bool TwiMaster::write(uint8_t data) {
   return status() == TWSR_MTX_DATA_ACK;
 }
 
+#elif defined(ARDUINO_ARCH_ESP8266)
+
+#include <twi.h>
+//------------------------------------------------------------------------------
+/**
+ * Initialize hardware TWI.
+ *
+ * \param[in] enablePullup Enable the AVR internal pull-ups. The internal
+ *  pull-ups can, in some systems, eliminate the need for external pull-ups.
+ */
+TwiMaster::TwiMaster(bool /* enablePullup */) {
+
+}
+//------------------------------------------------------------------------------
+/** Read a byte and send Ack if more reads follow else Nak to terminate read.
+ *
+ * \param[in] last Set true to terminate the read else false.
+ *
+ * \return The byte read from the I2C bus.
+ */
+uint8_t TwiMaster::read(uint8_t last) {
+  uint8_t rxBuffer;
+  twi_readFrom(addressRW_, &rxBuffer, 1, last);
+  return rxBuffer;
+}
+//------------------------------------------------------------------------------
+/** Issue a restart condition.
+ *
+ * \param[in] addressRW I2C address with read/write bit.
+ *
+ * \return The value true, 1, for success or false, 0, for failure.
+ */
+bool TwiMaster::restart(uint8_t addressRW) {
+  return start(addressRW);
+}
+//------------------------------------------------------------------------------
+/** Issue a start condition.
+ *
+ * \param[in] addressRW I2C address with read/write bit.
+ *
+ * \return The value true for success or false for failure.
+ */
+bool TwiMaster::start(uint8_t addressRW) {
+  addressRW_ = addressRW;
+  twi_init(TWI_SDA_PIN, TWI_SCL_PIN);
+  // TODO: set frequency/conversion etc.
+}
+//------------------------------------------------------------------------------
+/** Issue a stop condition. */
+void TwiMaster::stop(void) {
+  twi_stop();
+}
+//------------------------------------------------------------------------------
+/**
+ * Write a byte.
+ *
+ * \param[in] data The byte to send.
+ *
+ * \return The value true, 1, if the slave returned an Ack or false for Nak.
+ */
+bool TwiMaster::write(uint8_t data) {
+  twi_writeTo(addressRW_, &data, 1, true);
+}
+
+#else
+#error unknown CPU
 #endif

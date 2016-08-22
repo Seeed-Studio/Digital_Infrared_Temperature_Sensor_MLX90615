@@ -57,8 +57,8 @@ uint8_t const TWI_SCL_PIN = 0;
 #elif defined(ARDUINO_ARCH_ESP8266)
 // NodeMCU 1.0
 
-uint8_t const TWI_SDA_PIN = 4;
-uint8_t const TWI_SCL_PIN = 5;
+uint8_t const TWI_SDA_PIN = SDA; // D3, GPIO0
+uint8_t const TWI_SCL_PIN = SCL; // D4, GPIO2
 //------------------------------------------------------------------------------
 #else  // AVR CPU
 #error unknown CPU
