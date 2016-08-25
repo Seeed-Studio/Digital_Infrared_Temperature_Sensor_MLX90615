@@ -105,7 +105,6 @@ class SoftI2cMaster : public I2cMasterBase {
   uint8_t sclPin_;
 };
 //------------------------------------------------------------------------------
-#if !defined(ARDUINO_ARCH_ESP8266)
 /**
  * \class TwiMaster
  * \brief Hardware I2C master class
@@ -119,13 +118,25 @@ class TwiMaster : public I2cMasterBase {
   bool restart(uint8_t addressRW);
   bool start(uint8_t addressRW);
   /** \return status from last TWI command - useful for library debug */
+  #if defined(ARDUINO_ARCH_AVR)
   uint8_t status(void) {return status_;}
+  #endif
   void stop(void);
   bool write(uint8_t data);
  private:
   TwiMaster() {}
+
+  #if defined(ARDUINO_ARCH_AVR)
+
   uint8_t status_;
   void execCmd(uint8_t cmdReg);
+
+  #elif defined(ARDUINO_ARCH_ESP8266)
+
+  uint8_t addressRW_ = 0;
+
+  #else
+  #error unknown CPU
+  #endif
 };
-#endif
 #endif  // I2C_MASTER_H
