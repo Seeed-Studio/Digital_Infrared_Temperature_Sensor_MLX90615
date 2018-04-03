@@ -1,0 +1,24 @@
+  
+#######################################
+# Syntax Coloring Map For Digital 
+# Infrared Temperature Sensor MLX90615
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+getTemperature	KEYWORD2
+getTemperatureFahrenheit	KEYWORD2
+readEEPROM	KEYWORD2
+writeEEPROM	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+MLX90615	LITERAL1
