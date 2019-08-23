@@ -132,7 +132,8 @@ public:
 	 * Parameters: emissivity – data to write into EEPROM
 	 * Return: 0 - success; -1 - crc8 check err.
 	****************************************************************/
-	int writeEEPROM(uint16_t emissivity) {
+	int write(uint8_t EEPROM_addr,uint16_t value)
+	{
 		char  buffer[6] = {0};
 	   char *write = buffer + 0;
 	   char *cmd = buffer + 1;
@@ -140,9 +141,9 @@ public:
 	   int dev = i2c_addr<<1;
 
 	   *write = dev;
-	   *cmd = AccessEEPROM;
-	   *(data++) = emissivity & 0xff;
-	   *(data++) = (emissivity >> 8) & 0xff;
+	   *cmd = EEPROM_addr;
+	   *(data++) = value & 0xff;
+	   *(data++) = (value >> 8) & 0xff;
 	   *data = crc8Msb(0x07, (uint8_t*)buffer, 4);
 
 	   Serial.println(*data, HEX);
@@ -155,13 +156,17 @@ public:
 	   Serial.println("CRC8 Check OK...");
 
 		 if(!bus->start(dev | I2C_WRITE)) return -1;
-		 if(!bus->write(AccessEEPROM)) return -1;
-		 if(!bus->write(emissivity & 0xff)) return -1;
-		 if(!bus->write((emissivity >> 8) & 0xff)) return -1;
+		 if(!bus->write(EEPROM_addr)) return -1;
+		 if(!bus->write(value & 0xff)) return -1;
+		 if(!bus->write((value >> 8) & 0xff)) return -1;
 		 if(!bus->write(data[0])) return -1;
 		 bus->stop();
 
 	   return 0;
+	}
+
+	int writeEmissivity(uint16_t emissivity){
+		return write(AccessEEPROM,emissivity);
 	}
 
 	/****************************************************************

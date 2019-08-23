@@ -5,16 +5,25 @@
 #define SCL_PIN 2   //define the SCL pin
 
 SoftI2cMaster i2c(SDA_PIN, SCL_PIN);
-MLX90615 mlx90615(DEVICE_ADDR, &i2c);
+MLX90615 mlx90615(0x00, &i2c);
 
+#define CUSTOM_ADDR 0x20
 
 void setup()
 {
   Serial.begin(9600);
   Serial.println("Setup...");
 
-  //mlx90615.writeEmissivity(Default_Emissivity); //write data into EEPROM when you need to adjust emissivity.
-  //mlx90615.readEEPROM(); //read EEPROM data to check whether it's a default one.
+  // 1. Change Addr
+  int result = mlx90615.write(0x10, CUSTOM_ADDR);
+  mlx90615.~MLX90615();
+  if(result<0) 
+    Serial.println("Error while changing addr");
+  else
+    Serial.println("Addr changed to "+ String(CUSTOM_ADDR,HEX));
+  
+  //2. Use NEW Addr
+  mlx90615 = MLX90615(CUSTOM_ADDR, &i2c);
 }
 
 void loop()
