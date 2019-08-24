@@ -146,7 +146,7 @@ public:
 	   *(data++) = (value >> 8) & 0xff;
 	   *data = crc8Msb(0x07, (uint8_t*)buffer, 4);
 
-	   Serial.println(*data, HEX);
+	//    Serial.println(*data, HEX);
 
 	   if(crc8Msb(0x07,(uint8_t*)buffer, 5))
 	   {
@@ -155,11 +155,11 @@ public:
 	   }
 	   Serial.println("CRC8 Check OK...");
 
-		 if(!bus->start(dev | I2C_WRITE)) return -1;
-		 if(!bus->write(EEPROM_addr)) return -1;
-		 if(!bus->write(value & 0xff)) return -1;
-		 if(!bus->write((value >> 8) & 0xff)) return -1;
-		 if(!bus->write(data[0])) return -1;
+		 if(!bus->start(dev | I2C_WRITE)) return -2;
+		 if(!bus->write(EEPROM_addr)) return -3;
+		 if(!bus->write(value & 0xff)) return -4;
+		 if(!bus->write((value >> 8) & 0xff)) return -5;
+		 if(!bus->write(data[0])) return -6;
 		 bus->stop();
 
 	   return 0;
