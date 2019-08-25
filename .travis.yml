@@ -1,0 +1,21 @@
+language: python
+python:
+    - "2.7"
+
+# Cache PlatformIO packages using Travis CI container-based infrastructure
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
+
+env:
+    - PLATFORMIO_CI_SRC=examples/singleDevice
+    - PLATFORMIO_CI_SRC=examples/multiDevice
+    - PLATFORMIO_CI_SRC=examples/changeAddr
+
+install:
+    - pip install -U platformio
+    - pio update
+
+script:
+    - platformio ci --lib="." --board=uno --board=d1_mini
