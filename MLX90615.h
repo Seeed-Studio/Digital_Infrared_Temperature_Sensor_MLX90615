@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include <I2cMaster.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #define MLX90615_OBJECT_TEMPERATURE     0x27
 #define MLX90615_AMBIENT_TEMPERATURE    0x26
@@ -13,9 +15,22 @@
 
 
 class MLX90615 {
+
+protected:
+	union {
+		uint8_t	buffer[5];
+		struct {
+			uint8_t dev;
+			uint8_t cmd;
+			uint8_t dataLow;
+			uint8_t dataHigh;
+			uint8_t pec;
+		};
+	};
+
 public:
 	I2cMasterBase *bus;
-	byte i2c_addr;
+	uint8_t i2c_addr;
 
 	/*******************************************************************
 	 * Function Name: init
@@ -23,7 +38,7 @@ public:
 	 * Parameters: sda pin, scl pin, i2c device address
 	 * Return: null
 	******************************************************************/
-	MLX90615(byte addr, I2cMasterBase *i2c) {
+	MLX90615(uint8_t addr, I2cMasterBase *i2c) {
 		i2c_addr = addr;
 		bus = i2c;
 	}
@@ -60,11 +75,8 @@ public:
 	 * Parameters: Temperature_kind - choose ambient or object Temperature
 	 * Return:  true for ok, false for failure
 	****************************************************************/
-	float getTemperature(int Temperature_kind) {
-		byte dev = (i2c_addr << 1);  // remain to be seen!
-		byte dataLow = 0;
-		byte dataHigh = 0;
-		byte pec = 0;
+	float getTemperature(int Temperature_kind, bool fahrenheit = false) {
+		dev = (i2c_addr << 1);  // remain to be seen!
 		float celcius = 0.0;
 
 		bus->start(dev | I2C_WRITE);
@@ -87,12 +99,16 @@ public:
 
 		celcius = (float)(tempData - 273.15);
 
-		return celcius;
-		//float fahrenheit = (celcius*1.8) + 32;
+		return fahrenheit ? (celcius*1.8) + 32 : celcius;
 	}
 
-	float getTemperatureFahrenheit(float celcius){
+	float toFahrenheit(float celcius){
 		return (celcius*1.8) + 32;
+	}
+
+	// In a later version this function might be deleted
+	float getTemperatureFahrenheit(float celcius){
+		return toFahrenheit(celcius);
 	}
 	/****************************************************************
 	 * Function Name: readEEPROM
@@ -100,25 +116,11 @@ public:
 	 * Parameters:
 	 * Return: -1 for failure, 0 for ok
 	****************************************************************/
-	int readEEPROM() {
-		int dev = i2c_addr << 1;
-		int dataLow = 0;
-		int dataHigh = 0;
-		int pec = 0;
+	int readEEPROM(uint8_t reg = AccessEEPROM) {
 
 		delay(500);
-		bus->start(dev | I2C_WRITE);
-		bus->write(AccessEEPROM);
-		// read
-		if(!bus->restart(dev | I2C_READ))
-		dataLow = bus->read(false);
-		dataHigh = bus->read(false);
-		pec = bus->read(true);
-		bus->stop();
 
-		uint16_t eepromData = 0x0000; // zero out the data
-
-		eepromData = (uint16_t)(((dataHigh & 0x007F) << 8) + dataLow);
+		uint16_t eepromData = readRegS16(reg);
 
 		Serial.print("eepromData: 0x");
 		Serial.println(eepromData, HEX);
@@ -132,19 +134,14 @@ public:
 	 * Parameters: emissivity – data to write into EEPROM
 	 * Return: 0 - success; -1 - crc8 check err.
 	****************************************************************/
-	int write(uint8_t EEPROM_addr,uint16_t value)
+	int write(uint8_t reg,uint16_t value, bool checksum = false)
 	{
-		char  buffer[6] = {0};
-	   char *write = buffer + 0;
-	   char *cmd = buffer + 1;
-	   char *data = buffer + 2;
-	   int dev = i2c_addr<<1;
-
-	   *write = dev;
-	   *cmd = EEPROM_addr;
-	   *(data++) = value & 0xff;
-	   *(data++) = (value >> 8) & 0xff;
-	   *data = crc8Msb(0x07, (uint8_t*)buffer, 4);
+		if (checksum) {
+	   dev = i2c_addr<<1;
+	   cmd = reg;
+	   dataLow = value & 0xff;
+	   dataHigh = (value >> 8) & 0xff;
+	   pec = crc8Msb(0x07, (uint8_t*)buffer, 4);
 
 	//    Serial.println(*data, HEX);
 
@@ -154,19 +151,22 @@ public:
 			 return -1;
 	   }
 	   Serial.println("CRC8 Check OK...");
+		}
 
 		 if(!bus->start(dev | I2C_WRITE)) return -2;
-		 if(!bus->write(EEPROM_addr)) return -3;
-		 if(!bus->write(value & 0xff)) return -4;
-		 if(!bus->write((value >> 8) & 0xff)) return -5;
-		 if(!bus->write(data[0])) return -6;
+		 if(!bus->write(cmd)) return -3;
+		 if(!bus->write(dataLow)) return -4;
+		 if(!bus->write(dataHigh)) return -5;
+		if (checksum) {
+		 if(!bus->write(pec)) return -6;
+		}
 		 bus->stop();
 
 	   return 0;
 	}
 
 	int writeEmissivity(uint16_t emissivity){
-		return write(AccessEEPROM,emissivity);
+		return write(AccessEEPROM,emissivity,true);
 	}
 
 	/****************************************************************
@@ -175,10 +175,10 @@ public:
 	 * Parameters:
 	 * Return: one byte data from i2c device
 	****************************************************************/
-	byte read8(byte reg)
+	uint8_t read8(uint8_t reg)
 	{
-		byte data;
-		byte dev = i2c_addr << 1;
+		uint8_t data;
+		uint8_t dev = i2c_addr << 1;
 
 		bus->start(dev | I2C_WRITE);
 		bus->write(reg);
@@ -197,18 +197,17 @@ public:
 	 * Parameters:
 	 * Return: int data
 	****************************************************************/
-	int readRegS16(byte reg)
+	int readRegS16(uint8_t reg)
 	{
-		uint8_t dataLow, dataHigh;
-		byte dev = i2c_addr << 1;
+		dev = i2c_addr << 1;
 
 		bus->start(dev | I2C_WRITE);
 		bus->write(reg);
 		// read
-		bus->restart(i2c_addr | I2C_READ);
+		bus->restart(dev | I2C_READ);
 		dataLow = bus->read(false);
 		dataHigh = bus->read(false);
-		bus->read(true);
+		pec = bus->read(true);
 		bus->stop();
 
 		return (int)(dataHigh << 8) || dataLow;
@@ -220,9 +219,9 @@ public:
 	 * Parameters:
 	 * Return:
 	****************************************************************/
-	void writeReg8(byte data, byte reg)
+	void writeReg8(uint8_t data, uint8_t reg)
 	{
-		byte dev = i2c_addr << 1;
+		uint8_t dev = i2c_addr << 1;
 
 		bus->start(dev | I2C_WRITE);
 		bus->write(reg);
@@ -236,9 +235,9 @@ public:
 	 * Parameters:
 	 * Return:
 	****************************************************************/
-	void writeReg16(uint16_t data, byte reg)
+	void writeReg16(uint16_t data, uint8_t reg)
 	{
-		byte dev = i2c_addr << 1;
+		uint8_t dev = i2c_addr << 1;
 
 		bus->start(dev | I2C_WRITE);
 		bus->write(reg);
