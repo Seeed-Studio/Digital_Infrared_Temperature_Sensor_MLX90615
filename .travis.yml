@@ -10,8 +10,12 @@ cache:
 
 env:
     - PLATFORMIO_CI_SRC=examples/singleDevice
-    - PLATFORMIO_CI_SRC=examples/multiDevice
+    - PLATFORMIO_CI_SRC=examples/singleDevice PLATFORMIO_BUILD_FLAGS="-D INCLUDED_I2C"
+    - PLATFORMIO_CI_SRC=examples/multiDevice PLATFORMIO_BUILD_FLAGS="-D BY_PINS"
+    - PLATFORMIO_CI_SRC=examples/multiDevice PLATFORMIO_BUILD_FLAGS="-D BY_ADDR"
+    - PLATFORMIO_CI_SRC=examples/multiDevice PLATFORMIO_BUILD_FLAGS="-D BY_ADDR -D INCLUDED_I2C"
     - PLATFORMIO_CI_SRC=examples/changeAddr
+    - PLATFORMIO_CI_SRC=examples/changeAddr PLATFORMIO_BUILD_FLAGS="-D INCLUDED_I2C"
 
 install:
     - pip install -U platformio
