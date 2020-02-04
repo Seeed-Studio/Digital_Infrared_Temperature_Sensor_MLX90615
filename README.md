@@ -1,4 +1,4 @@
-# Digital_Infrared_Temperature_Sensor_MLX90615
+# Digital_Infrared_Temperature_Sensor_MLX90615  [![Build Status](https://travis-ci.com/Seeed-Studio/Digital_Infrared_Temperature_Sensor_MLX90615.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Digital_Infrared_Temperature_Sensor_MLX90615)
 
 [![Build Status](https://travis-ci.com/AsharaStudios/Digital_Infrared_Temperature_Sensor_MLX90615.svg?branch=master)](https://travis-ci.com/AsharaStudios/Digital_Infrared_Temperature_Sensor_MLX90615)
 
