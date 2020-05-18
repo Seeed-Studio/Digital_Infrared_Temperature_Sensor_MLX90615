@@ -12,7 +12,7 @@
 #include "MLX90615.h"
 
 // #define BY_PINS // Uncomment this to use pins for every MLX
-// #define BY_ADDR // Uncomment this to use single bus
+#define BY_ADDR // Uncomment this to use single bus
 
 #ifdef BY_PINS // USING ADDITIONAL PINS
     byte sda_1 = 3;
