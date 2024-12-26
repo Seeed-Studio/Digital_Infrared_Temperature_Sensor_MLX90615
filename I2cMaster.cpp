@@ -230,8 +230,7 @@ bool TwiMaster::write(uint8_t data) {
     return status() == TWSR_MTX_DATA_ACK;
 }
 
-#elif defined(ARDUINO_ARCH_ESP8266)
-
+#elif defined(ARDUINO_ARCH_ESP8266) 
 #include <twi.h>
 //------------------------------------------------------------------------------
 /**
@@ -295,5 +294,5 @@ bool TwiMaster::write(uint8_t data) {
 }
 
 #else
-#error unknown CPU
+// #error unknown CPU
 #endif

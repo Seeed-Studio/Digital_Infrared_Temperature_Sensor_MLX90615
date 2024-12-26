@@ -133,12 +133,10 @@ class TwiMaster : public I2cMasterBase {
     uint8_t status_;
     void execCmd(uint8_t cmdReg);
 
-    #elif defined(ARDUINO_ARCH_ESP8266)
-
+    #elif defined(ARDUINO_ARCH_ESP8266) 
     uint8_t addressRW_ = 0;
-
     #else
-#error unknown CPU
+// #error unknown CPU
     #endif
 };
 #endif  // I2C_MASTER_H

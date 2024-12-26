@@ -60,7 +60,10 @@
     uint8_t const TWI_SDA_PIN = SDA; // D3, GPIO0
     uint8_t const TWI_SCL_PIN = SCL; // D4, GPIO2
     //------------------------------------------------------------------------------
+#elif defined(SEEED_XIAO_M0) ||defined(ARDUINO_XIAO_RA4M1) || defined(NRF52840_XXAA) || defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_ARCH_RP2350) || defined(CONFIG_IDF_TARGET_ESP32S3) || defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6)
+    uint8_t const TWI_SDA_PIN = D4; // D3, GPIO0
+    uint8_t const TWI_SCL_PIN = D5; // D4, GPIO2
 #else  // AVR CPU
-    #error unknown CPU
+    // #error unknown CPU
 #endif  // AVR CPU
 #endif  // TwiMap_h
